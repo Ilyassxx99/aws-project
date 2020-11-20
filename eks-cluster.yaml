@@ -1,0 +1,39 @@
+Resources:
+  eksClusterRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - eks.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
+  myCluster:
+    Type: 'AWS::EKS::Cluster'
+    DependsOn: eksClusterRole
+    Properties:
+      Name: prod
+      Version: '1.17'
+      RoleArn: !GetAtt eksClusterRole.Arn
+      ResourcesVpcConfig:
+        SubnetIds:
+          - !ImportValue PublicSubnet01ID
+          - !ImportValue PublicSubnet02ID
+
+Outputs:
+  ClusterName:
+    Description: The Name of the cluster
+    Value: !Ref myCluster
+    Export:
+      Name: ClusterName
+  ClusterSecurityGroupId:
+    Description: The security group that Amazon EKS will use to create AWS resources for Kubernetes clusters
+    Value: !GetAtt myCluster.ClusterSecurityGroupId
+    Export:
+      Name: ClusterSecurityGroupId

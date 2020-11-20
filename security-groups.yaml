@@ -1,0 +1,55 @@
+Description:  This template creates security-groups for the intances that will be launched by eks
+
+Resources:
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "web-sg"
+      GroupDescription: "Security group for web instances"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue VpcID
+
+  AppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: "app-sg"
+      GroupDescription: "Security group for app instances"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue VpcID
+
+
+Outputs:
+
+  WebSecurityGroup:
+    Description: Security group for web instances
+    Value: !Ref WebSecurityGroup
+    Export:
+      Name: WebSG-ID
+
+  AppSecurityGroup:
+    Description: Security group for app instances
+    Value: !Ref AppSecurityGroup
+    Export:
+      Name: AppSG-ID
+
+  DbSecurityGroup:
+    Description: Security group for db instances
+    Value: !Ref DbSecurityGroup
+    Export:
+      Name: DbSG-ID
